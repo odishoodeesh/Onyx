@@ -11,6 +11,44 @@ const IconSociety = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" hei
 const IconSave = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>;
 const IconRefresh = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>;
 const IconAtom = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-9.17-4.52-15.95C11.14-2.53 4 1.48 2 3.5c-2.04 2.03-.02 9.17 4.52 15.95 4.53 6.78 11.67 2.77 13.68.75z"/><path d="M15.8 4.2c-2.04-2.03-9.17-.02-15.95 4.52C-6.93 13.25-2.92 20.4-1 22.4s9.17.02 15.95-4.52c6.78-4.53 2.77-11.67.75-13.68z"/></svg>;
+const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>;
+
+// Ad Component
+const AdUnit: React.FC = () => {
+  const adRef = useRef<HTMLModElement>(null);
+
+  useEffect(() => {
+    const pushAd = () => {
+      try {
+        // @ts-ignore
+        const adsbygoogle = (window.adsbygoogle = window.adsbygoogle || []);
+        // Check if the current element has already been processed by AdSense
+        if (adRef.current && !adRef.current.hasAttribute('data-adsbygoogle-status')) {
+          adsbygoogle.push({});
+        }
+      } catch (e) {
+        console.error("AdSense error:", e);
+      }
+    };
+
+    // Use a small delay to ensure that the parent container has computed a width
+    // This is especially important for elements inside flexbox or with animations
+    const timer = setTimeout(pushAd, 150);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="ad-container">
+      <ins ref={adRef}
+           className="adsbygoogle"
+           style={{ display: 'block', width: '100%' }}
+           data-ad-client="ca-pub-9619447476010525"
+           data-ad-slot="auto"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [universe, setUniverse] = useState<Universe | null>(null);
@@ -19,11 +57,12 @@ const App: React.FC = () => {
   const [showSaved, setShowSaved] = useState(false);
   const [isExpanding, setIsExpanding] = useState(false);
   const [loadingText, setLoadingText] = useState('Calibrating multiversal lens...');
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const lastSeedRef = useRef<number | null>(null);
 
   const expandUniverseWithAI = useCallback(async (baseUni: Universe) => {
     setIsExpanding(true);
-    setLoadingText("Scanning dimension coordinates...");
+    setLoadingText("Stabilizing singularity points...");
     
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -56,7 +95,7 @@ const App: React.FC = () => {
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
       const expandedData = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
       
-      setLoadingText("Rendering visual data...");
+      setLoadingText("Streaming visual data from orbit...");
       
       // Image generation
       const imageResponse = await ai.models.generateContent({
@@ -99,14 +138,11 @@ const App: React.FC = () => {
   const updateUniverse = useCallback((force = false) => {
     const seed = Math.floor(Date.now() / (30 * 60 * 1000));
     
-    // Skip if we already have this universe generated for this cycle and not forcing
     if (!force && seed === lastSeedRef.current) return;
     
     lastSeedRef.current = seed;
     const newUniverse = generateUniverse(seed);
     setUniverse(newUniverse);
-    
-    // Trigger expansion
     expandUniverseWithAI(newUniverse);
   }, [expandUniverseWithAI]);
 
@@ -159,6 +195,14 @@ const App: React.FC = () => {
     localStorage.setItem('saved_universes', JSON.stringify(updated));
   };
 
+  const shareDimension = () => {
+    if (!universe) return;
+    const url = window.location.href;
+    navigator.clipboard.writeText(`Check out Dimension #${universe.seed} on Alternate Universe Generator: ${url}`);
+    setCopyStatus("Link Copied!");
+    setTimeout(() => setCopyStatus(null), 2000);
+  };
+
   if (!universe) return null;
 
   return (
@@ -166,15 +210,26 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+          <div className="flex items-center gap-2 mb-1">
+             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Synced Reality</span>
+          </div>
           <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Dimension #<span className="text-indigo-400 font-mono">{universe.seed}</span></h1>
           <p className="text-slate-400 flex items-center gap-2">
-            <IconClock /> Next shift in <span className="text-indigo-300 font-mono">{timeLeft}</span>
+            <IconClock /> Reality shift in <span className="text-indigo-300 font-mono">{timeLeft}</span>
           </p>
         </div>
-        <div className="flex gap-2 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-right-4 duration-500">
+          <button 
+            onClick={shareDimension}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 transition rounded-lg text-sm font-semibold border border-slate-700 relative"
+          >
+            {copyStatus ? <span className="text-green-400">Copied!</span> : <><IconShare /> Share</>}
+          </button>
           <button 
             onClick={() => updateUniverse(true)}
             className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 transition rounded-lg text-sm font-semibold border border-slate-700"
+            title="Refresh Multiversal Connection"
           >
             <IconRefresh /> Sync
           </button>
@@ -191,22 +246,22 @@ const App: React.FC = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-slate-200">The Multiverse Archive</h2>
-            <button onClick={() => setShowSaved(false)} className="text-sm text-indigo-400 hover:underline">Back to Now</button>
+            <button onClick={() => setShowSaved(false)} className="text-sm text-indigo-400 hover:underline font-bold">RETURN TO NOW</button>
           </div>
           {savedUniverses.length === 0 ? (
             <div className="text-center py-20 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800">
-              <p className="text-slate-500">No dimensions archived yet.</p>
+              <p className="text-slate-500">No dimensions archived yet. Save one from the main screen.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {savedUniverses.map(u => (
                 <div key={u.id} className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between hover:border-indigo-500/50 transition group cursor-pointer" onClick={() => { setUniverse(u); setShowSaved(false); }}>
                   <div>
-                    <h3 className="font-bold text-slate-200"># {u.seed}</h3>
+                    <h3 className="font-bold text-slate-200">Dimension # {u.seed}</h3>
                     <p className="text-xs text-slate-500">{u.society.techLevel} • {u.planet.climate}</p>
                   </div>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                    <button onClick={(e) => removeSaved(u.id, e)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg">Delete</button>
+                    <button onClick={(e) => removeSaved(u.id, e)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg text-xs font-bold">PURGE</button>
                   </div>
                 </div>
               ))}
@@ -217,11 +272,11 @@ const App: React.FC = () => {
         <div className="animate-in fade-in duration-700 space-y-6">
           
           {/* Hero Visual Card */}
-          <section className="relative w-full aspect-[21/9] bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 group shadow-2xl shadow-indigo-500/5">
+          <section className="relative w-full aspect-[21/9] bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 group shadow-2xl shadow-indigo-500/10">
             {isExpanding ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-900/80 backdrop-blur-sm z-10">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-900/80 backdrop-blur-md z-10">
                 <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-                <p className="text-sm font-mono text-indigo-300 animate-pulse">{loadingText}</p>
+                <p className="text-xs font-mono text-indigo-300 animate-pulse tracking-widest uppercase">{loadingText}</p>
               </div>
             ) : null}
             
@@ -229,24 +284,29 @@ const App: React.FC = () => {
               <img src={universe.imageUrl} alt="Dimension Visual" className="w-full h-full object-cover transition duration-1000 group-hover:scale-105" />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-slate-900 to-indigo-950 flex items-center justify-center">
-                <IconPlanet />
+                <div className="text-center space-y-4">
+                   <div className="mx-auto w-12 h-12 text-slate-700"><IconPlanet /></div>
+                   <p className="text-slate-600 font-mono text-[10px] uppercase tracking-tighter">Satellite Uplink Disconnected</p>
+                </div>
               </div>
             )}
             
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-950 to-transparent">
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent">
               <div className="max-w-3xl">
                 <span className="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
-                  {universe.location || "Coalescing Coordinates..."}
+                  {universe.location || "COALESCING COORDINATES..."}
                 </span>
-                <p className="text-xl md:text-2xl font-semibold text-white drop-shadow-md leading-relaxed">
-                  {universe.description || "Entering a new fold of reality. Stand by for multiversal synchronization."}
+                <p className="text-xl md:text-3xl font-bold text-white drop-shadow-lg leading-tight md:leading-normal">
+                  {universe.description || "Entering a new fold of reality. Fictional physics stabilizing. Deterministic seed confirmed."}
                 </p>
               </div>
             </div>
           </section>
 
+          {/* Ad Slot One */}
+          <AdUnit />
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Left Column: Headlines & Physical Laws */}
             <div className="md:col-span-2 space-y-6">
               
               <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
@@ -257,7 +317,7 @@ const App: React.FC = () => {
                 <div className="space-y-6">
                   {universe.headlines.map((headline, idx) => (
                     <div key={idx} className="group relative pb-6 border-b border-slate-800/50 last:border-0 last:pb-0">
-                      <p className="text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors duration-200">
+                      <p className="text-lg md:text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors duration-200">
                         {headline}
                       </p>
                       <div className="flex items-center gap-4 mt-2">
@@ -270,7 +330,6 @@ const App: React.FC = () => {
               </section>
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Physical Laws */}
                 <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
                   <div className="flex items-center gap-2 mb-4 text-indigo-400">
                     <IconAtom />
@@ -301,7 +360,6 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                {/* History Card */}
                 <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
                   <div className="flex items-center gap-2 mb-4 text-slate-400">
                     <IconHistory />
@@ -325,10 +383,7 @@ const App: React.FC = () => {
               </section>
             </div>
 
-            {/* Right Column: Planet, Society & Facts */}
             <div className="space-y-6">
-              
-              {/* Planetary Diagnostics */}
               <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
                 <div className="flex items-center gap-2 mb-4 text-slate-400">
                   <IconPlanet />
@@ -350,7 +405,6 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              {/* Localized Anomalies */}
               <section className="bg-indigo-600/10 rounded-2xl border border-indigo-500/20 p-6 overflow-hidden relative">
                 <div className="absolute -right-4 -top-4 opacity-5 rotate-12">
                    <IconAtom />
@@ -365,12 +419,11 @@ const App: React.FC = () => {
                       </li>
                     ))
                   ) : (
-                    <li className="text-sm text-slate-500 italic">Calculating local variances...</li>
+                    <li className="text-sm text-slate-500 italic animate-pulse">Scanning local variances...</li>
                   )}
                 </ul>
               </section>
 
-              {/* Societal Profile */}
               <section className="bg-slate-900/50 rounded-2xl border border-slate-800 p-6">
                 <div className="flex items-center gap-2 mb-4 text-slate-400">
                   <IconSociety />
@@ -385,46 +438,36 @@ const App: React.FC = () => {
                     <span className="text-[10px] text-slate-500 uppercase block mb-1">Technological Era</span>
                     <span className="text-indigo-200 font-medium">{universe.society.techLevel}</span>
                   </div>
-                  <div className="pt-3 border-t border-slate-800/50">
-                     <span className="text-[10px] text-slate-500 uppercase block mb-1">Est. Sapient Count</span>
-                     <span className="text-sm font-semibold">{universe.society.population}</span>
-                  </div>
                 </div>
               </section>
 
-              {/* Quick Actions */}
               <div className="pt-4 flex flex-col gap-3">
                 <button 
                   onClick={saveCurrentUniverse}
                   disabled={!!savedUniverses.find(u => u.id === universe.id)}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 transition-all rounded-2xl font-bold shadow-lg shadow-indigo-500/20 active:scale-95"
                 >
-                  {!!savedUniverses.find(u => u.id === universe.id) ? 'Dimension Archived' : 'Archive this Reality'}
+                  {!!savedUniverses.find(u => u.id === universe.id) ? 'DIMENSION ARCHIVED' : 'ARCHIVE THIS REALITY'}
                 </button>
-                
-                <div className="relative group cursor-help">
-                  <div className="w-full py-3 bg-slate-900/30 border border-slate-800 text-slate-500 transition rounded-2xl text-center text-sm">
-                    Become a Premium Traveler
-                  </div>
-                  <div className="absolute -top-12 left-0 w-full bg-slate-800 text-xs text-slate-200 p-3 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center border border-slate-700 shadow-xl">
-                    Coming Soon: Manual Seed Entry & High-Res Downloads.
-                  </div>
-                </div>
+                <p className="text-[10px] text-center text-slate-500 font-mono">Archive persistent between sessions (LocalStorage)</p>
               </div>
 
+              {/* Sidebar Ad Unit */}
+              <AdUnit />
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
       <footer className="mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-600 text-[10px] uppercase tracking-widest">
-        <p>© 202X Chronos Multiverse Systems. Distributed by Deterministic Engine.</p>
-        <p className="flex items-center gap-2">
-           Model Version <span className="text-slate-400 font-mono">1.2.5-STABLE</span>
-           <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-           Live Connection
-        </p>
+        <p>© 202X Chronos Multiverse Systems. Shared Global Instance.</p>
+        <div className="flex items-center gap-4">
+           <a href="/ads.txt" target="_blank" className="hover:text-indigo-400 transition">Ads.txt</a>
+           <p className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+              LIVE DATASTREAM
+           </p>
+        </div>
       </footer>
     </div>
   );
