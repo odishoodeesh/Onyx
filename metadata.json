@@ -1,5 +1,5 @@
 {
-  "name": "Onyx - Alternate Universe Generator",
-  "description": "A high-fidelity window into the shared multiverse, generating unique fictional dimensions every 30 minutes using advanced AI and deterministic seeding.",
+  "name": "Alternate Universe Generator",
+  "description": "Witness a new fictional dimension every 30 minutes. High-fidelity universe generation using Gemini AI and deterministic procedural seeds.",
   "requestFramePermissions": []
 }

@@ -7,21 +7,21 @@
     
     <!-- Primary Meta Tags -->
     <meta name="title" content="Alternate Universe Generator">
-    <meta name="description" content="A window into another dimension. A new fictional universe is generated every 30 minutes, shared by all travelers across the globe.">
+    <meta name="description" content="Witness a new fictional dimension every 30 minutes. Explore unique planetary physics, alien societies, and historical nexus events shared by everyone on Earth.">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://alternate-universe-generator.vercel.app/">
     <meta property="og:title" content="Alternate Universe Generator | Shared Multiverse">
-    <meta property="og:description" content="A window into another dimension. A new fictional universe is generated every 30 minutes, shared by all travelers.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&q=80&w=1000">
+    <meta property="og:description" content="Explore a new shared reality every 30 minutes. Advanced AI-generated universes with unique laws and histories.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1200">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://alternate-universe-generator.vercel.app/">
     <meta property="twitter:title" content="Alternate Universe Generator | Shared Multiverse">
-    <meta property="twitter:description" content="A window into another dimension. A new fictional universe is generated every 30 minutes, shared by all travelers.">
-    <meta property="twitter:image" content="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&q=80&w=1000">
+    <meta property="twitter:description" content="Explore a new shared reality every 30 minutes. Witness the birth of a new dimension.">
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1200">
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9619447476010525" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,21 +31,37 @@
             font-family: 'Inter', sans-serif;
             background-color: #020617; /* Slate 950 */
             color: #f8fafc; /* Slate 50 */
+            overflow-x: hidden;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
         /* AdSense Placeholder Styling */
         .ad-container {
-            min-height: 100px;
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px dashed rgba(71, 85, 105, 0.5);
-            /* Removed flex to avoid zero-width issues with responsive slots */
+            min-height: 120px;
+            background: rgba(30, 41, 59, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.2);
             display: block;
-            border-radius: 1rem;
-            margin: 2rem 0;
+            border-radius: 1.5rem;
+            margin: 2.5rem 0;
             overflow: hidden;
             width: 100%;
+            position: relative;
+        }
+        .ad-label {
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(71, 85, 105, 0.5);
+            pointer-events: none;
+        }
+        ::selection {
+            background-color: #6366f1;
+            color: white;
         }
     </style>
 <script type="importmap">
