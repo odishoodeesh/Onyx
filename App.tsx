@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
-import { generateUniverse } from './services/universeGenerator';
-import { Universe, SavedUniverse } from './types';
+import { generateUniverse } from './services/universeGenerator.ts';
+import { Universe, SavedUniverse } from './types.ts';
 
 // Icons implemented as simple SVG components
 const IconClock = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
@@ -75,7 +75,7 @@ const App: React.FC = () => {
     setLoadingText("Stabilizing singularity points...");
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
       
       const textResponse = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
