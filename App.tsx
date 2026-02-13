@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
-import { generateUniverse } from './services/universeGenerator.ts';
-import { Universe, SavedUniverse } from './types.ts';
+import { generateUniverse } from './services/universeGenerator';
+import { Universe, SavedUniverse } from './types';
 
 // Icons implemented as simple SVG components
 const IconClock = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
@@ -15,7 +15,6 @@ const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" heigh
 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1200";
 
-// Ad Component
 const AdUnit: React.FC = () => {
   const adRef = useRef<HTMLModElement>(null);
 
@@ -71,11 +70,17 @@ const App: React.FC = () => {
   const lastSeedRef = useRef<number | null>(null);
 
   const expandUniverseWithAI = useCallback(async (baseUni: Universe) => {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      console.warn("API Key missing, skipping AI expansion.");
+      return;
+    }
+
     setIsExpanding(true);
     setLoadingText("Stabilizing singularity points...");
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+      const ai = new GoogleGenAI({ apiKey });
       
       const textResponse = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -176,7 +181,7 @@ const App: React.FC = () => {
       }
     }, 1000);
 
-    const stored = localStorage.getItem('saved_universes_v2');
+    const stored = localStorage.getItem('saved_universes_v3');
     if (stored) {
       try {
         setSavedUniverses(JSON.parse(stored));
@@ -193,14 +198,14 @@ const App: React.FC = () => {
     if (savedUniverses.find(u => u.id === universe.id)) return;
     const updated = [...savedUniverses, { ...universe, savedAt: Date.now() }];
     setSavedUniverses(updated);
-    localStorage.setItem('saved_universes_v2', JSON.stringify(updated));
+    localStorage.setItem('saved_universes_v3', JSON.stringify(updated));
   };
 
   const removeSaved = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const updated = savedUniverses.filter(u => u.id !== id);
     setSavedUniverses(updated);
-    localStorage.setItem('saved_universes_v2', JSON.stringify(updated));
+    localStorage.setItem('saved_universes_v3', JSON.stringify(updated));
   };
 
   const shareDimension = async () => {

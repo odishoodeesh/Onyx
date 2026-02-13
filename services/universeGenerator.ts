@@ -1,5 +1,5 @@
-import { PRNG } from './prng.ts';
-import { Universe } from '../types.ts';
+import { PRNG } from './prng';
+import { Universe } from '../types';
 
 const TECH_LEVELS = [
   'Stone Age', 'Medieval', 'Industrial', 'Modern', 'Cyberpunk', 
