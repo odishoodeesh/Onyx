@@ -70,9 +70,10 @@ const App: React.FC = () => {
   const lastSeedRef = useRef<number | null>(null);
 
   const expandUniverseWithAI = useCallback(async (baseUni: Universe) => {
+    // process.env.API_KEY is defined by Vite. Check for string validity.
     const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      console.warn("API Key missing, skipping AI expansion.");
+    if (!apiKey || apiKey === "") {
+      console.warn("AI Expansion requires an API_KEY. Proceeding with procedural baseline only.");
       return;
     }
 
